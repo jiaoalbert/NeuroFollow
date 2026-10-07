@@ -1,0 +1,6 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {topics,sources,recommend}=require('../data.js');
+test('all twelve topics have a valid recommendation and cited source',()=>{assert.equal(topics.length,12);for(const t of topics){assert.ok(recommend(t.id).text);for(const r of t.refs)assert.match(sources[r].url,/^https:\/\//)}});
+test('11 mm typical adult pineal cyst does not require routine surveillance',()=>assert.match(recommend('pineal',{size:11}).text,/generally not required/));
+test('pituitary threshold distinguishes micro from macro',()=>{assert.match(recommend('pituitary',{size:9}).text,/at 1 year/);assert.match(recommend('pituitary',{size:10}).text,/at 6 months/)});
+test('symptoms and atypical findings override incidental pathways',()=>{for(const t of topics){assert.match(recommend(t.id,{symptoms:'acute'}).title,/Urgent/);assert.match(recommend(t.id,{appearance:'atypical'}).title,/characterization/);assert.match(recommend(t.id,{symptoms:'present'}).title,/specialist/);assert.match(recommend(t.id,{age:'child'}).title,/Pediatric/)}});
+test('no unsupported fixed interval for cavernous or skull lesions',()=>{assert.match(recommend('cavernous').text,/not well established/);assert.match(recommend('skull').text,/no universal interval/)});
